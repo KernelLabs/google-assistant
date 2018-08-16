@@ -26,17 +26,19 @@ function GoogleAssistant(authConfig, callback) {
     if (callback) callback(assistant);
   });
 
+  let me = this;
   this.start = (conversationConfig, callback) => {
-    if (assistant === undefined) {
-      const error = new Error('Tried calling start() before the ready event!');
-      this.emit('error', error);
-      if (callback) callback(error);
-      return;
-    }
+    return new Promise((resolve, reject) => {
+      if (assistant === undefined) {
+        const error = new Error('Tried calling start() before the ready event!');
+        me.emit('error', error);
+        reject(error);
+      }
 
-    const conversation = new Conversation(assistant, conversationConfig);
-    this.emit('started', conversation);
-    if (callback) callback(conversation);
+      const conversation = new Conversation(assistant, conversationConfig);
+      me.emit('started', conversation);
+      resolve(conversation);
+    });
   };
 
   return this;
